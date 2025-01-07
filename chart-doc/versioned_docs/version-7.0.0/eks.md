@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Installation on AWS Elastic Kubernetes Service 
+# Installation on AWS Elastic Kubernetes Service (Enterprise Edition)
 
 Let's discover Installation of [formsflow.ai](https://formsflow.ai/) using formsflow-ai-charts in AWS Elastic Kubernetes Service. Formsflow.ai is a Free, Open-Source, Low Code Development Platform for rapidly building powerful business applications. [formsflow.ai](https://formsflow.ai/) combines leading Open-Source applications including form.io forms, Camunda’s workflow engine, Keycloak’s security, and Redash’s data analytics into a seamless, integrated platform.
 
@@ -164,26 +164,29 @@ This command provides an overview of the current status and details of SSL certi
 ```bash
 helm upgrade --install forms-flow-ai forms-flow-ai --set Domain=<domain> --set postgresql-ha.postgresql.podSecurityContext.enabled=true --set mongodb.podSecurityContext.enabled=true --set insight_api_key=<insight_api_key> -n <namespace>
 ```
-Initiate the deployment of the Forms Flow AI component using Helm. Customize the command by replacing `domain`, `Image-secret`, `insight-api-key`, and `namespace` with the actual domain, Docker image secret, Insight API key, and namespace respectively. This step ensures the seamless deployment of the Forms Flow AI component in your Kubernetes environment.
+To deploy the enterprise version, provide Docker image credentials using the `imageCredentials.username` and `imageCredentials.password` settings.
+
+> Note: You need to substitute the placeholders `DOMAIN_NAME`, and `INSIGHT_API_KEY` with your specific values. For example, in the case of Formsflow, you might use `DOMAIN_NAME=example.com` and `INSIGHT_API_KEY=your_insight_api_key` for Enterprise edition use, `--set imageCredentials.username=DOCKER_USERNAME` and` --set imageCredentials.password=DOCKER_PASSWORD`
+
+**Important:** Both the Docker username `(DOCKER_USERNAME)` and password `(DOCKER_PASSWORD)` should be provided by the [formsflow.ai](https://formsflow.ai/) team. Ensure you receive these credentials before proceeding with the setup.
 
 Initially, set the `insight-api-key` to 'test.' Once Analytics is deployed, obtain the correct Insight API key and redeploy the Forms Flow AI component to ensure proper integration
 
 ### 2. forms-flow-analytics
-```bash
+
+```yaml
 helm upgrade --install forms-flow-analytics forms-flow-analytics --set ingress.ingressClassName=<ingress_classname> --set ingress.hosts[0].host=<forms-flow-analytics-hostname> --set ingress.tls[0].secretName=<forms-flow-analytics-hostname-tls> --set ingress.tls[0].hosts[0]=<forms-flow-analytics-hostname> --set ingress.hosts[0].paths[0]="/" --set ingress.subFilterHost=<forms-flow-analytics-hostname> -n <namespace>
 ```
-
 ### 3. forms-flow-idm
 
 ```bash
 helm upgrade --install forms-flow-idm forms-flow-idm  --set keycloak.ingress.hostname=<forms-flow-idm-hostname> --set postgresql-ha.postgresql.podSecurityContext.enabled=true --set keycloak.ingress.ingressClassName=<ingress_classname> --set keycloak.ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-idm -n <namespace>
 ```
-
 ### 4. forms-flow-bpm
-```bash
-helm upgrade --install forms-flow-bpm forms-flow-bpm --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-bpm-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-bpm --set camunda.websocket.securityOrigin=<forms-flow-web-hostname> -n <namespace>
-```
 
+```bash
+helm upgrade --install forms-flow-bpm forms-flow-bpm --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-bpm-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-bpm --set camunda.websocket.securityOrigin=<forms-flow-web-hostname> --set image.repository=formsflow/forms-flow-bpm-ee -n <namespace>
+```
 ### 5. forms-flow-forms
 
 ```bash
@@ -192,32 +195,52 @@ helm upgrade --install forms-flow-forms forms-flow-forms --set ingress.ingressCl
 ### 6. forms-flow-api
 
 ```bash
-helm upgrade --install forms-flow-api forms-flow-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-api -n <namespace>
+helm upgrade --install forms-flow-api forms-flow-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-api --set image.repository=formsflow/forms-flow-webapi-ee -n <namespace>
+```
+Make sure to replace `ipaas.embedded_api_key` and `ipaas.jwt_private_key` with the actual keys provided to you.
+
+Example:
+```yaml
+ipaas:
+  embedded_api_key: IPAAS_EMBEDDED_API_KEY
+  jwt_private_key: IPAAS_JWT_PRIVATE_KEY
 ```
 
 ### 7. forms-flow-documents-api
 
 ```bash
-helm upgrade --install forms-flow-documents-api forms-flow-documents-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-documents-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-documents-api -n <namespace>
+helm upgrade --install forms-flow-documents-api forms-flow-documents-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-documents-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-documents-api --set image.repository=formsflow/forms-flow-documents-api-ee -n <namespace>
 ```
-
 ### 8. forms-flow-data-analysis
 
 ```bash
-helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-data-analysis-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-data-analysis -n <namespace>
+helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-data-analysis-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-data-analysis --set image.repository=formsflow/forms-flow-data-analysis-api-ee -n <namespace>
+```
+Make sure to replace `openApiKey` with the actual key in the `values.yaml` file provided to you.
+
+Example:
+```yaml
+openApiKey: OPENAI_API_KEY
 ```
 
 ### 9. forms-flow-web
 
 ```bash
-helm upgrade --install forms-flow-web forms-flow-web --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-web-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-web -n <namespace>
+helm upgrade --install forms-flow-web forms-flow-web --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-web-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-web --set image.repository=formsflow/forms-flow-web-ee -n <namespace>
+```
+Make sure to replace `clarity_key` and `show_premium_icon` with the appropriate values provided to you.
+
+Example: 
+```yaml
+ShowPremiumIcon: SHOW_PREMIUM_ICON
+ClarityKey: true
 ```
 
 ### 10. forms-flow-admin
+
 ```bash
 helm upgrade --install forms-flow-admin forms-flow-admin --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-admin-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-admin -n <namespace>
 ```
-
 ## Conclusion
 
 In this guide, we walked through the process of installing [formsflow.ai](https://formsflow.ai/) on AWS Elastic Kubernetes Service (EKS) using formsflow-ai-charts. We covered essential steps, including setting up the necessary tools (AWS CLI, Kubectl, and Helm), connecting to your EKS cluster, and deploying components of [formsflow.ai](https://formsflow.ai/) while ensuring secure communication and efficient traffic management through SSL certificates and an Nginx Ingress Controller.
