@@ -2,18 +2,13 @@
 sidebar_position: 1
 ---
 
-# Installation on AWS Elastic Kubernetes Service 
+# Kubernetes
 
 Let's discover Installation of [formsflow.ai](https://formsflow.ai/) using formsflow-ai-charts in AWS Elastic Kubernetes Service. Formsflow.ai is a Free, Open-Source, Low Code Development Platform for rapidly building powerful business applications. [formsflow.ai](https://formsflow.ai/) combines leading Open-Source applications including form.io forms, Camunda’s workflow engine, Keycloak’s security, and Redash’s data analytics into a seamless, integrated platform.
 
-## Prerequisite
-
-- AWS CLI: A command line tool for working with AWS services, including Amazon EKS. For more information, see [Installing AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- Kubectl: A command line tool for working with Kubernetes clusters. For more information, see [Installing or Updating Kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)
-- Helm: Helps to manage Kubernetes applications , for more information see [Installing and Updating the helm](https://helm.sh/docs/intro/install)
 
 
-## Step 1: Clone the GitHub Repository
+## Clone the GitHub Repository
 
 In this initial step, clone the Forms Flow AI Charts GitHub repository using the following commands:
 
@@ -22,431 +17,142 @@ $ git clone https://github.com/AOT-Technologies/forms-flow-ai-charts
 $ cd charts
 ```
 
-## Step 2: Connect to the EKS Cluster
+## Custom Domain Setup
 
-After cloning the GitHub repository, use the command below to connect to your Kubernetes cluster. Replace cluster-name with your actual cluster name:
+### 1. Retrieve Load Balancer Information / Custer-IP information
 
-```
-$ aws eks update-kubeconfig --region ca-central-1 --name <cluster-name>
-```
+Look for the External IP address or DNS name associated with the Load Balancer. The exact label may vary based on the cloud provider (for example, it might be `EXTERNAL-IP`, `LoadBalancer Ingress`, or `DNS name` depending on the platform you're using).
 
-This command updates your “**kubeconfig**” file, enabling seamless communication with your Amazon EKS (Elastic Kubernetes Service) cluster located in the specified AWS region. Establishing this connection is essential for managing and deploying applications within the Kubernetes environment.
+### 2. Configure DNS Records with Your Domain Provider
+- Log in to your domain provider's console (e.g., AWS Route 53, Azure DNS, Google Cloud DNS, etc.)
+- Navigate to the DNS management or Hosted Zones section corresponding to your domain.
+- Add a new DNS record:
+    - Record type: Choose CNAME or A depending on the provider and the type of Load Balancer (e.g., if you have a static IP, choose A, if you have a DNS name, choose CNAME).
+    - Name: Set this to the desired subdomain (e.g., app, www).
+    - Value: Set the value to the External IP address or DNS name obtained from the Load Balancer.
+        - For cloud providers with static IPs (e.g., AWS, GCP, Azure), use the IP address.
+        - For cloud providers that assign a DNS name to the Load Balancer (e.g., AWS ELB or GCP HTTP(S) Load Balancer), use the DNS name.
+- Save the DNS record.
 
-## Step 3: Create a Namespace in the Cluster
 
-After connecting to the Kubernetes cluster, the next step is to create a dedicated namespace. Execute the following command, replacing **namespace** with the desired name for your namespace:
+## 1. forms-flow-ai
 
-```bash
-$ kubectl craete ns namesapce
-```
+The [formsflow.ai](https://formsflow.ai/) Helm chart is designed to deploy the core components of the [formsflow.ai](https://formsflow.ai/) application in your Kubernetes environment. This chart is highly configurable, providing flexibility to adapt to different database configurations and other key settings. Here's a breakdown of its features:
 
-This command establishes an isolated namespace within the cluster, allowing you to organize and manage resources effectively
+- Common ConfigMap and Secrets:
 
-## Step 4: Install Nginx Ingress Controller in EKS using Helm
+    - This chart allows you to create essential ConfigMaps and Secrets required by the application, ensuring that sensitive information like API keys, database credentials, and other environment-specific configurations are securely managed.
 
-Following the namespace creation, proceed to install the Nginx Ingress Controller in your EKS cluster using Helm. Perform the following steps:
-
-### Add the Nginx Ingress Helm Repository:
-
-```bash
-$ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-```
-
-### Update the Helm Repository:
-
-```bash
-$ helm repo update
-```
-
-### Install Nginx Ingress Controller using Helm:
+- High Availability (HA) Database Configuration:
+    - Local Database: If you're using a local database (like PostgreSQL and MongoDB), this chart will automatically set up the databases with high availability (HA) configurations. It ensures that your databases are fault-tolerant and can handle traffic without downtime.
+    - External Database: If you prefer to use an external database (e.g., an external managed PostgreSQL or MongoDB instance), you can configure the chart to connect to your external database by setting the appropriate database connection parameters such as host, port, username, and password
+- Customizable Domain
+    - Replace `domain` with your custom domain (e.g., app.yourdomain.com) to point to the application after deployment.
+- This chart ensures that Forms Flow AI is easily deployed with flexible database options (HA local or external) and secure configuration management, making it suitable for both development and production environments.
 
 ```bash
-helm install ingress-nginx-<namespace> ingress-nginx/ingress-nginx --set controller.ingressClass=<ingress-classname> --set controller.ingressClassResource.name=<ingress-classname> -n <namespace> 
+helm upgrade --install forms-flow-ai forms-flow-ai \
+  --set Domain=<domain> \
+  --set postgresql-ha.postgresql.podSecurityContext.enabled=true \
+  --set mongodb.podSecurityContext.enabled=true \
+  -n <namespace>
 ```
 
-Customize the ingress class and associated resources by replacing **ingress-classname** (default is "nginx"). This step sets up efficient external traffic management within Kubernetes.
+## 2. forms-flow-idm
 
-## Step 5: Pointing Ingress Loadbalancer in Domain Name Provider to access the App using Domain Name
-
-1. **Get the loadbalancer**
-
-    Use the following command to retrieve information about the Load Balancer associated with your Ingress Controller in the specified namespace:
-
-    ```bash
-    $ kubectl get svc -n <namespace>
-    ```
-    Identify the External IP address or DNS name associated with the Load Balancer.
-
-2. **Configure AWS Route 53**
-
-    - Log in to the AWS Management Console and navigate to Route53
-    - Select the hosted Zone corresponding to your domain
-    - Add a new record
-    - Set the "Name" field to the desired subdomain (eg:- app)
-    - Choose "CNAME" as the record type
-    - set the value to the External IP address or DNS name obtained from the Load Balancer.
-    - Save the changes.
-
-
-Once the DNS settings propagate, users can access your application using the custom domain (e.g., app.yourdomain.com). This setup establishes a CNAME record pointing to the Ingress Load Balancer, ensuring a direct connection between your custom domain and the application.
-
-
-
-## Step 6: Installing ACM (AWS Certificate Manager)
-
-Execute the following command to deploy AWS Certificate Manager (ACM) components in your Kubernetes cluster:
+The [formsflow.ai](https://formsflow.ai/) framework could be hooked up with any OpenID Connect compliant Identity Management Server. To date, we have only tested [Keycloak](https://github.com/keycloak/keycloak).
 
 ```bash
-$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml 
+helm upgrade --install forms-flow-idm forms-flow-idm \
+ --set keycloak.ingress.hostname=<forms-flow-idm-hostname> \
+ --set postgresql-ha.postgresql.podSecurityContext.enabled=true \ 
+ -n <namespace>
 ```
 
-This step installs Cert-Manager, a Kubernetes add-on for managing SSL/TLS certificates.
+    ## 3. forms-flow-bpm
+[formsflow.ai](https://formsflow.ai/) leverages [Camunda](https://camunda.com/) for workflow and decision automation.
 
-## Step 7: Installing EBS-CSI driver
-
-Generate a Kubernetes secret named aws-secret in the kube-system namespace by providing your AWS access key ID and secret access key. Make sure to replace `access-key-id` and `secret-access-key` with your actual AWS credentials. 
-```
-$ kubectl create secret generic aws-secret  --namespace kube-system --from-literal "key_id=<access-key-id>"  --from-literal "access_key=<secret-access-key>"
-```
-This secret is crucial for secure communication between the Kubernetes cluster and AWS services, ensuring proper authentication.
-
-Add the aws-ebs-csi-driver Helm repository.
+To know more about Camunda, visit [Camunda](https://camunda.com/).
 
 ```bash
-$ helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-
-$ helm repo update
+helm upgrade --install forms-flow-bpm forms-flow-bpm \ 
+ --set ingress.hostname=<forms-flow-bpm-hostname> \
+ --set camunda.websocket.securityOrigin=<forms-flow-web-hostname> \
+ -n <namespace>
 ```
 
-Then install a release of the driver using the chart.
+## 4. forms-flow-forms
+
+[formsflow.ai](https://formsflow.ai/) leverages form.io to build "serverless" data management applications using a simple drag-and-drop form builder interface.
+
+To know more about form.io, go to https://form.io.
 
 ```bash
-$ helm upgrade --install aws-ebs-csi-driver  --namespace kube-system  aws-ebs-csi-driver/aws-ebs-csi-driver
+helm upgrade --install forms-flow-forms forms-flow-forms \
+ --set ingress.hostname=<forms-flow-forms-hostname> \
+ -n <namespace>
 ```
-This step is essential for accessing and deploying the AWS EBS CSI driver, enabling seamless integration of AWS Elastic Block Store volumes within your Kubernetes cluster
+## 5. forms-flow-api
 
-## Step 8: Create SSL Certificates for Each Domain
-Execute the following Helm command to generate SSL certificates for each domain in your specified namespace:
+[formsflow.ai](https://formsflow.ai/) has built this adaptive tier for correlating form management, BPM and analytics together.
+
+The goal of the REST API is to provide access to all relevant interfaces of the system.
 
 ```bash
-$ helm install ssl-<component> forms-flow-ssl/forms-flow-<component> --set Domain=<domain> --set issuer.acmeEmail=<valid-email>  --set issuer.ingressClass=<ingress-classname> -n <namespace>
+helm upgrade --install forms-flow-api forms-flow-api \
+ --set ingress.hostname=<forms-flow-api-hostname> \
+ -n <namespace>
 ```
-### These are the components 
-- analytics
-- idm
-- bpm
-- forms
-- api
-- documents-api
-- data-analysis-api
-- web
-- admin
 
-Generate SSL certificates for a specific component in the designated namespace using Helm. Customize the command by replacing `component`, `domain`, `valid-email`, and `ingress-classname` with the actual component name, domain, a valid email for ACME registration, and the ingress class name, respectively. This step enhances the security of your applications by enabling HTTPS access.
+## 6. forms-flow-documents-api
 
-### Example Command
-For instance, to create SSL certificates for the forms component in the production namespace with a specific domain and email, the command would look like this:
+The goal of the document API is to generate pdf with form submission data.
 
 ```bash
-$ helm install ssl-forms forms-flow-ssl/forms-flow-forms --set Domain=example.com --set issuer.acmeEmail=your-email@example.com --set issuer.ingressClass=nginx -n production
+helm upgrade --install forms-flow-documents-api forms-flow-documents-api \
+ --set ingress.hostname=<forms-flow-documents-api-hostname> \
+ -n <namespace>
 ```
 
-Check the status of SSL certificates in the specified namespace using the command:
-```bash
-kubectl get certificates -n <namespace>
-```
+## 7. forms-flow-data-analysis
 
-This command provides an overview of the current status and details of SSL certificates, ensuring a quick verification of successful certificate issuance and proper configuration within the Kubernetes environment
-
-## Step 8: Deploy each Components
-
-### 1. forms-flow-ai
-```bash
-helm upgrade --install forms-flow-ai forms-flow-ai --set Domain=<domain> --set postgresql-ha.postgresql.podSecurityContext.enabled=true --set mongodb.podSecurityContext.enabled=true --set insight_api_key=<insight_api_key> -n <namespace>
-```
-Initiate the deployment of the Forms Flow AI component using Helm. Customize the command by replacing `domain`, `Image-secret`, `insight-api-key`, and `namespace` with the actual domain, Docker image secret, Insight API key, and namespace respectively. This step ensures the seamless deployment of the Forms Flow AI component in your Kubernetes environment.
-
-Initially, set the `insight-api-key` to 'test.' Once Analytics is deployed, obtain the correct Insight API key and redeploy the Forms Flow AI component to ensure proper integration
-
-### 2. forms-flow-analytics
-```bash
-helm upgrade --install forms-flow-analytics forms-flow-analytics --set ingress.ingressClassName=<ingress_classname> --set ingress.hosts[0].host=<forms-flow-analytics-hostname> --set ingress.tls[0].secretName=<forms-flow-analytics-hostname-tls> --set ingress.tls[0].hosts[0]=<forms-flow-analytics-hostname> --set ingress.hosts[0].paths[0]="/" --set ingress.subFilterHost=<forms-flow-analytics-hostname> -n <namespace>
-```
-
-### 3. forms-flow-idm
+This module is intended to update forms based on specific topics mentioned by the designer during form creation.
 
 ```bash
-helm upgrade --install forms-flow-idm forms-flow-idm  --set keycloak.ingress.hostname=<forms-flow-idm-hostname> --set postgresql-ha.postgresql.podSecurityContext.enabled=true --set keycloak.ingress.ingressClassName=<ingress_classname> --set keycloak.ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-idm -n <namespace>
+helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis \
+ --set ingress.hostname=<forms-flow-data-analysis-hostname> \
+ -n <namespace>
 ```
 
-### 4. forms-flow-bpm
-```bash
-helm upgrade --install forms-flow-bpm forms-flow-bpm --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-bpm-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-bpm --set camunda.websocket.securityOrigin=<forms-flow-web-hostname> -n <namespace>
-```
+## 8. forms-flow-web
 
-### 5. forms-flow-forms
-
-```bash
-helm upgrade --install forms-flow-forms forms-flow-forms --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-forms-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-forms -n <namespace>
-```
-### 6. forms-flow-api
+[formsflow.ai](https://formsflow.ai/) delivers progressive web application with React version 17.0.2 along with formio
 
 ```bash
-helm upgrade --install forms-flow-api forms-flow-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-api -n <namespace>
+helm upgrade --install forms-flow-web forms-flow-web \
+ --set ingress.hostname=<forms-flow-web-hostname> \
+ -n <namespace>
 ```
 
-### 7. forms-flow-documents-api
+## 9. forms-flow-analytics `-optional`
+
+[formsflow.ai](https://formsflow.ai/) leverages [Redash](https://github.com/getredash/redash) to build interactive dashboards and gain insights. To create meaningful visualization for your use case with [Redash Knowledge base.](https://redash.io/help/) 
 
 ```bash
-helm upgrade --install forms-flow-documents-api forms-flow-documents-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-documents-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-documents-api -n <namespace>
+helm upgrade --install forms-flow-analytics forms-flow-analytics \
+ --set ingress.hosts[0].host=<forms-flow-analytics-hostname> \
+ --set ingress.tls[0].secretName=<forms-flow-analytics-hostname-tls> \
+ --set ingress.tls[0].hosts[0]=<forms-flow-analytics-hostname> \
+ --set ingress.hosts[0].paths[0]="/" \
+ --set ingress.subFilterHost=<forms-flow-analytics-hostname> \
+ -n <namespace>
 ```
+Once Analytics is deployed, obtain the correct Insight API key and redeploy the [forms-flow-ai](#1-forms-flow-ai) component to ensure proper integration
 
-### 8. forms-flow-data-analysis
-
-```bash
-helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-data-analysis-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-data-analysis -n <namespace>
-```
-
-### 9. forms-flow-web
-
-```bash
-helm upgrade --install forms-flow-web forms-flow-web --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-web-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-web -n <namespace>
-```
-
-### 10. forms-flow-admin
-```bash
-helm upgrade --install forms-flow-admin forms-flow-admin --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-admin-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-admin -n <namespace>
-```
 
 ## Conclusion
 
-In this guide, we walked through the process of installing [formsflow.ai](https://formsflow.ai/) on AWS Elastic Kubernetes Service (EKS) using formsflow-ai-charts. We covered essential steps, including setting up the necessary tools (AWS CLI, Kubectl, and Helm), connecting to your EKS cluster, and deploying components of [formsflow.ai](https://formsflow.ai/) while ensuring secure communication and efficient traffic management through SSL certificates and an Nginx Ingress Controller.
+In this guide, we walked through the process of installing [formsflow.ai](https://formsflow.ai/) on Kubernetes using `formsflow-ai-charts`. We covered essential steps, including setting up the necessary tools (AWS CLI, Kubectl, and Helm), connecting to your EKS cluster, and deploying components of [formsflow.ai](https://formsflow.ai/) while ensuring secure communication and efficient traffic management through SSL certificates and an Nginx Ingress Controller.
 
-By following these instructions, you can leverage the power of formsflow.ai to build powerful business applications with ease, benefiting from its integration of leading open-source technologies like form.io, Camunda, Keycloak, and Redash.
-
----
-sidebar_position: 1
----
-
-# Installation on AWS Elastic Kubernetes Service 
-
-Let's discover Installation of [formsflow.ai](https://formsflow.ai/) using formsflow-ai-charts in AWS Elastic Kubernetes Service. Formsflow.ai is a Free, Open-Source, Low Code Development Platform for rapidly building powerful business applications. [formsflow.ai](https://formsflow.ai/) combines leading Open-Source applications including form.io forms, Camunda’s workflow engine, Keycloak’s security, and Redash’s data analytics into a seamless, integrated platform.
-
-## Prerequisite
-
-- AWS CLI: A command line tool for working with AWS services, including Amazon EKS. For more information, see [Installing AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- Kubectl: A command line tool for working with Kubernetes clusters. For more information, see [Installing or Updating Kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)
-- Helm: Helps to manage Kubernetes applications , for more information see [Installing and Updating the helm](https://helm.sh/docs/intro/install)
-
-
-## Step 1: Clone the GitHub Repository
-
-In this initial step, clone the Forms Flow AI Charts GitHub repository using the following commands:
-
-```bash
-$ git clone https://github.com/AOT-Technologies/forms-flow-ai-charts
-$ cd charts
-```
-
-## Step 2: Connect to the EKS Cluster
-
-After cloning the GitHub repository, use the command below to connect to your Kubernetes cluster. Replace cluster-name with your actual cluster name:
-
-```
-$ aws eks update-kubeconfig --region ca-central-1 --name <cluster-name>
-```
-
-This command updates your “**kubeconfig**” file, enabling seamless communication with your Amazon EKS (Elastic Kubernetes Service) cluster located in the specified AWS region. Establishing this connection is essential for managing and deploying applications within the Kubernetes environment.
-
-## Step 3: Create a Namespace in the Cluster
-
-After connecting to the Kubernetes cluster, the next step is to create a dedicated namespace. Execute the following command, replacing **namespace** with the desired name for your namespace:
-
-```bash
-$ kubectl craete ns namesapce
-```
-
-This command establishes an isolated namespace within the cluster, allowing you to organize and manage resources effectively
-
-## Step 4: Install Nginx Ingress Controller in EKS using Helm
-
-Following the namespace creation, proceed to install the Nginx Ingress Controller in your EKS cluster using Helm. Perform the following steps:
-
-### Add the Nginx Ingress Helm Repository:
-
-```bash
-$ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-```
-
-### Update the Helm Repository:
-
-```bash
-$ helm repo update
-```
-
-### Install Nginx Ingress Controller using Helm:
-
-```bash
-helm install ingress-nginx-<namespace> ingress-nginx/ingress-nginx --set controller.ingressClass=<ingress-classname> --set controller.ingressClassResource.name=<ingress-classname> -n <namespace> 
-```
-
-Customize the ingress class and associated resources by replacing **ingress-classname** (default is "nginx"). This step sets up efficient external traffic management within Kubernetes.
-
-## Step 5: Pointing Ingress Loadbalancer in Domain Name Provider to access the App using Domain Name
-
-1. **Get the loadbalancer**
-
-    Use the following command to retrieve information about the Load Balancer associated with your Ingress Controller in the specified namespace:
-
-    ```bash
-    $ kubectl get svc -n <namespace>
-    ```
-    Identify the External IP address or DNS name associated with the Load Balancer.
-
-2. **Configure AWS Route 53**
-
-    - Log in to the AWS Management Console and navigate to Route53
-    - Select the hosted Zone corresponding to your domain
-    - Add a new record
-    - Set the "Name" field to the desired subdomain (eg:- app)
-    - Choose "CNAME" as the record type
-    - set the value to the External IP address or DNS name obtained from the Load Balancer.
-    - Save the changes.
-
-
-Once the DNS settings propagate, users can access your application using the custom domain (e.g., app.yourdomain.com). This setup establishes a CNAME record pointing to the Ingress Load Balancer, ensuring a direct connection between your custom domain and the application.
-
-
-
-## Step 6: Installing ACM (AWS Certificate Manager)
-
-Execute the following command to deploy AWS Certificate Manager (ACM) components in your Kubernetes cluster:
-
-```bash
-$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml 
-```
-
-This step installs Cert-Manager, a Kubernetes add-on for managing SSL/TLS certificates.
-
-## Step 7: Installing EBS-CSI driver
-
-Generate a Kubernetes secret named aws-secret in the kube-system namespace by providing your AWS access key ID and secret access key. Make sure to replace `access-key-id` and `secret-access-key` with your actual AWS credentials. 
-```
-$ kubectl create secret generic aws-secret  --namespace kube-system --from-literal "key_id=<access-key-id>"  --from-literal "access_key=<secret-access-key>"
-```
-This secret is crucial for secure communication between the Kubernetes cluster and AWS services, ensuring proper authentication.
-
-Add the aws-ebs-csi-driver Helm repository.
-
-```bash
-$ helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-
-$ helm repo update
-```
-
-Then install a release of the driver using the chart.
-
-```bash
-$ helm upgrade --install aws-ebs-csi-driver  --namespace kube-system  aws-ebs-csi-driver/aws-ebs-csi-driver
-```
-This step is essential for accessing and deploying the AWS EBS CSI driver, enabling seamless integration of AWS Elastic Block Store volumes within your Kubernetes cluster
-
-## Step 8: Create SSL Certificates for Each Domain
-Execute the following Helm command to generate SSL certificates for each domain in your specified namespace:
-
-```bash
-$ helm install ssl-<component> forms-flow-ssl/forms-flow-<component> --set Domain=<domain> --set issuer.acmeEmail=<valid-email>  --set issuer.ingressClass=<ingress-classname> -n <namespace>
-```
-### These are the components 
-- analytics
-- idm
-- bpm
-- forms
-- api
-- documents-api
-- data-analysis-api
-- web
-- admin
-
-Generate SSL certificates for a specific component in the designated namespace using Helm. Customize the command by replacing `component`, `domain`, `valid-email`, and `ingress-classname` with the actual component name, domain, a valid email for ACME registration, and the ingress class name, respectively. This step enhances the security of your applications by enabling HTTPS access.
-
-### Example Command
-For instance, to create SSL certificates for the forms component in the production namespace with a specific domain and email, the command would look like this:
-
-```bash
-$ helm install ssl-forms forms-flow-ssl/forms-flow-forms --set Domain=example.com --set issuer.acmeEmail=your-email@example.com --set issuer.ingressClass=nginx -n production
-```
-
-Check the status of SSL certificates in the specified namespace using the command:
-```bash
-kubectl get certificates -n <namespace>
-```
-
-This command provides an overview of the current status and details of SSL certificates, ensuring a quick verification of successful certificate issuance and proper configuration within the Kubernetes environment
-
-## Step 8: Deploy each Components
-
-### 1. forms-flow-ai
-```bash
-helm upgrade --install forms-flow-ai forms-flow-ai --set Domain=<domain> --set postgresql-ha.postgresql.podSecurityContext.enabled=true --set mongodb.podSecurityContext.enabled=true --set insight_api_key=<insight_api_key> -n <namespace>
-```
-Initiate the deployment of the Forms Flow AI component using Helm. Customize the command by replacing `domain`, `Image-secret`, `insight-api-key`, and `namespace` with the actual domain, Docker image secret, Insight API key, and namespace respectively. This step ensures the seamless deployment of the Forms Flow AI component in your Kubernetes environment.
-
-Initially, set the `insight-api-key` to 'test.' Once Analytics is deployed, obtain the correct Insight API key and redeploy the Forms Flow AI component to ensure proper integration
-
-### 2. forms-flow-analytics
-```bash
-helm upgrade --install forms-flow-analytics forms-flow-analytics --set ingress.ingressClassName=<ingress_classname> --set ingress.hosts[0].host=<forms-flow-analytics-hostname> --set ingress.tls[0].secretName=<forms-flow-analytics-hostname-tls> --set ingress.tls[0].hosts[0]=<forms-flow-analytics-hostname> --set ingress.hosts[0].paths[0]="/" --set ingress.subFilterHost=<forms-flow-analytics-hostname> -n <namespace>
-```
-
-### 3. forms-flow-idm
-
-```bash
-helm upgrade --install forms-flow-idm forms-flow-idm  --set keycloak.ingress.hostname=<forms-flow-idm-hostname> --set postgresql-ha.postgresql.podSecurityContext.enabled=true --set keycloak.ingress.ingressClassName=<ingress_classname> --set keycloak.ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-idm -n <namespace>
-```
-
-### 4. forms-flow-bpm
-```bash
-helm upgrade --install forms-flow-bpm forms-flow-bpm --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-bpm-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-bpm --set camunda.websocket.securityOrigin=<forms-flow-web-hostname> -n <namespace>
-```
-
-### 5. forms-flow-forms
-
-```bash
-helm upgrade --install forms-flow-forms forms-flow-forms --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-forms-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-forms -n <namespace>
-```
-### 6. forms-flow-api
-
-```bash
-helm upgrade --install forms-flow-api forms-flow-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-api -n <namespace>
-```
-
-### 7. forms-flow-documents-api
-
-```bash
-helm upgrade --install forms-flow-documents-api forms-flow-documents-api --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-documents-api-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-documents-api -n <namespace>
-```
-
-### 8. forms-flow-data-analysis
-
-```bash
-helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-data-analysis-hostname> --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-data-analysis -n <namespace>
-```
-
-### 9. forms-flow-web
-
-```bash
-helm upgrade --install forms-flow-web forms-flow-web --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-web-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-web -n <namespace>
-```
-
-### 10. forms-flow-admin
-```bash
-helm upgrade --install forms-flow-admin forms-flow-admin --set ingress.ingressClassName=<ingress_classname> --set ingress.hostname=<forms-flow-admin-hostname>  --set ingress.annotations."cert-manager\.io/cluster-issuer"=ssl-admin -n <namespace>
-```
-
-## Conclusion
-
-In this guide, we walked through the process of installing [formsflow.ai](https://formsflow.ai/) on AWS Elastic Kubernetes Service (EKS) using formsflow-ai-charts. We covered essential steps, including setting up the necessary tools (AWS CLI, Kubectl, and Helm), connecting to your EKS cluster, and deploying components of [formsflow.ai](https://formsflow.ai/) while ensuring secure communication and efficient traffic management through SSL certificates and an Nginx Ingress Controller.
-
-By following these instructions, you can leverage the power of formsflow.ai to build powerful business applications with ease, benefiting from its integration of leading open-source technologies like form.io, Camunda, Keycloak, and Redash.
+By following these instructions, you can leverage the power of [formsflow.ai](https://formsflow.ai/) to build powerful business applications with ease, benefiting from its integration of leading open-source technologies like form.io, Camunda, Keycloak, and Redash.
 
