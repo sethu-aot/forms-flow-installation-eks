@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Installation of Formsflow.ai on Linux
+# Linux / MAC
 
 ### Prerequisites
 
