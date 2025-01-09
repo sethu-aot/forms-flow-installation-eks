@@ -1,0 +1,15 @@
+{
+  "tutorialSidebar": [
+    "windows",
+    "linux",
+    {
+      "type": "category",
+      "label": "Kubernetes",
+      "items": [
+        "intro",
+        "eks"
+      ],
+      "collapsed": true
+    }
+  ]
+}
