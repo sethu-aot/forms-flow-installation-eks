@@ -8,9 +8,21 @@ sidebar_position: 1
 Let's discover Installation of [formsflow.ai](https://formsflow.ai/) using formsflow-ai-charts in AWS Elastic Kubernetes Service. Formsflow.ai is a Free, Open-Source, Low Code Development Platform for rapidly building powerful business applications. [formsflow.ai](https://formsflow.ai/) combines leading Open-Source applications including form.io forms, Camunda’s workflow engine, Keycloak’s security, and Redash’s data analytics into a seamless, integrated platform.
 
 
-## Clone the GitHub Repository
+## Installing Chart
 
-In this initial step, clone the Forms Flow AI Charts GitHub repository using the following commands:
+To install forms-flow-ai helm chart, You can obtain forms-flow-ai-chart repository Helm CLI using the following command,
+
+```bash
+helm repo add formsflow https://aot-technologies.github.io/forms-flow-ai-charts
+helm repo update
+```
+To install Helm chart you can use the following command
+
+```bash
+helm install release-name forms-flow
+```
+
+If you wish to customize and configure the chart, clone the repository using following commands and do the necessary changes.
 
 ```bash
 $ git clone https://github.com/AOT-Technologies/forms-flow-ai-charts
@@ -59,6 +71,15 @@ helm upgrade --install forms-flow-ai forms-flow-ai \
 ```
 The list of customizable parameters for the `forms-flow-ai` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-ai/README.md).
 
+:::info
+If you are using keycloak as external, please do the necessary changes according to the existing keycloak configuration.
+
+To configure keycloak as external, update the following parameters.
+- Hostname of keycloak
+- Forms-flow-bpm client secret
+- Keycloak realm name
+:::
+
 ## 2. forms-flow-idm
 
 The [formsflow.ai](https://formsflow.ai/) framework could be hooked up with any OpenID Connect compliant Identity Management Server. To date, we have only tested [Keycloak](https://github.com/keycloak/keycloak).
@@ -70,6 +91,12 @@ helm upgrade --install forms-flow-idm forms-flow-idm \
  -n <namespace>
 ```
 The list of customizable parameters for the `forms-flow-idm` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-idm/README.md).
+
+:::info
+
+If you having an exinsting keycloak, no need to install this component.
+For reference on records needed to support formsflow can be found [here](https://github.com/AOT-Technologies/forms-flow-ai/blob/develop/forms-flow-idm/realm-exports/Group%20based%20auth.json).
+:::
 
 ## 3. forms-flow-bpm
 [formsflow.ai](https://formsflow.ai/) leverages [Camunda](https://camunda.com/) for workflow and decision automation.
