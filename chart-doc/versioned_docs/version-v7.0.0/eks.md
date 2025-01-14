@@ -99,9 +99,9 @@ helm upgrade --install forms-flow-idm forms-flow-idm \
 The list of customizable parameters for the `forms-flow-idm` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-idm/README.md).
 
 :::info
+If you have an existing Keycloak, there's no need to install this component.
 
-If you having an exinsting keycloak, no need to install this component.
-For reference on records needed to support formsflow can be found [here](https://github.com/AOT-Technologies/forms-flow-ai/blob/develop/forms-flow-idm/realm-exports/Group%20based%20auth.json).
+For reference, the records needed to support [formsflow.ai](https://formsflow.ai/) can be found [here](https://github.com/AOT-Technologies/forms-flow-ai/blob/develop/forms-flow-idm/realm-exports/Group%20based%20auth.json).
 :::
 
 ## 3. forms-flow-bpm
@@ -209,7 +209,7 @@ helm upgrade --install forms-flow-admin forms-flow-admin \
  --set ingress.hostname=<forms-flow-admin-hostname>  \
   -n <namespace>
 ```
-How to Create a Tenant To create a new tenant, follow the instructions detailed in the [Create Tenant](/docs/next/tenant-creation) page.
+To create a new tenant, follow the instructions detailed on the [Create Tenant](/docs/next/tenant-creation) page.
 
 ## Conclusion
 

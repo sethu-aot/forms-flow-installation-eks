@@ -97,7 +97,7 @@ Next, in the Body tab of Postman, choose raw and select JSON. Then, add the foll
 This JSON object includes the key, name, and details for the new tenant. You can modify these values to match the tenant information you wish to create.
 
 #### Send the Request
-Click Send to create the tenant. If the request is successful, you should receive a response with the tenant details, such as:
+How to Create a Tenant To create a new tenant, follow the instructions detailed in the [Create Tenant](/docs/next/tenant-creation) page.
 
 ```bash
 {}
