@@ -69,20 +69,23 @@ helm upgrade --install forms-flow-ai forms-flow-ai \
   --set mongodb.podSecurityContext.enabled=true \
   -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-ai` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-ai/README.md).
+The list of customizable parameters for the `forms-flow-ai` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-ai/README.md).
 
 :::info
-If you are using keycloak as external, please do the necessary changes according to the existing keycloak configuration.
+If you are using Keycloak as an external service, ensure the necessary adjustments are made to align with the required Keycloak configuration.
 
-To configure keycloak as external, update the following parameters.
-- Hostname of keycloak
+To configure Keycloak as an external service, update the following parameters:
+
+- Keycloak hostname
 - Forms-flow-bpm client secret
 - Keycloak realm name
+
+For more information on how to integrate an external Keycloak service, please refer to this [link](https://github.com/AOT-Technologies/forms-flow-ai-charts/tree/master/charts/forms-flow-ai#use-an-external-keycloak).
 :::
 
 ## 2. forms-flow-idm
 
-The [formsflow.ai](https://formsflow.ai/) framework could be hooked up with any OpenID Connect compliant Identity Management Server. To date, we have only tested [Keycloak](https://github.com/keycloak/keycloak).
+The [formsflow.ai](https://formsflow.ai/) framework can be integrated with any OpenID Connect-compliant Identity Management Server. Currently, we have only tested it with [Keycloak](https://github.com/keycloak/keycloak).
 
 ```bash
 helm upgrade --install forms-flow-idm forms-flow-idm \
@@ -90,13 +93,7 @@ helm upgrade --install forms-flow-idm forms-flow-idm \
  --set postgresql-ha.postgresql.podSecurityContext.enabled=true \ 
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-idm` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-idm/README.md).
-
-:::info
-If you have an existing Keycloak, there's no need to install this component.
-
-For reference, the records needed to support [formsflow.ai](https://formsflow.ai/) can be found [here](https://github.com/AOT-Technologies/forms-flow-ai/blob/develop/forms-flow-idm/realm-exports/Group%20based%20auth.json).
-:::
+The list of customizable parameters for the `forms-flow-idm` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-idm/README.md).
 
 ## 3. forms-flow-bpm
 [formsflow.ai](https://formsflow.ai/) leverages [Camunda](https://camunda.com/) for workflow and decision automation.
@@ -109,7 +106,7 @@ helm upgrade --install forms-flow-bpm forms-flow-bpm \
  --set camunda.websocket.securityOrigin=<forms-flow-web-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-bpm` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-bpm/README.md).
+The list of customizable parameters for the `forms-flow-bpm` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-bpm/README.md).
 
 ## 4. forms-flow-forms
 
@@ -122,7 +119,7 @@ helm upgrade --install forms-flow-forms forms-flow-forms \
  --set ingress.hostname=<forms-flow-forms-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-forms` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-forms/README.md).
+The list of customizable parameters for the `forms-flow-forms` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-forms/README.md).
 
 ## 5. forms-flow-api
 
@@ -135,7 +132,7 @@ helm upgrade --install forms-flow-api forms-flow-api \
  --set ingress.hostname=<forms-flow-api-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-api` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-api/README.md).
+The list of customizable parameters for the `forms-flow-api` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-api/README.md).
 
 ## 6. forms-flow-documents-api
 
@@ -146,7 +143,7 @@ helm upgrade --install forms-flow-documents-api forms-flow-documents-api \
  --set ingress.hostname=<forms-flow-documents-api-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-documents-api` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-documents-api/README.md).
+The list of customizable parameters for the `forms-flow-documents-api` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-documents-api/README.md).
 
 ## 7. forms-flow-web
 
@@ -157,7 +154,7 @@ helm upgrade --install forms-flow-web forms-flow-web \
  --set ingress.hostname=<forms-flow-web-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-web` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-web/README.md).
+The list of customizable parameters for the `forms-flow-web` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-web/README.md).
 
 ## 8. forms-flow-data-analysis (Optional)
 
@@ -168,7 +165,7 @@ helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis \
  --set ingress.hostname=<forms-flow-data-analysis-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-data-analysis` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-data-analysis/README.md).
+The list of customizable parameters for the `forms-flow-data-analysis` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-data-analysis/README.md).
 
 ## 9. forms-flow-analytics (Optional)
 
@@ -185,9 +182,14 @@ helm upgrade --install forms-flow-analytics forms-flow-analytics \
  --set ingress.subFilterHost=<forms-flow-analytics-hostname> \
  -n <namespace>
 ```
-The list of customizable parameters for the `forms-flow-analytics` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/staging/QA/charts/forms-flow-analytics/README.md).
+The list of customizable parameters for the `forms-flow-analytics` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-analytics/README.md).
 
-Once Analytics is deployed, obtain the correct Insight API key and redeploy the [forms-flow-ai](#1-forms-flow-ai) component to ensure proper integration
+After deploying the analytics, log in to your Redash application to retrieve the Insight API key. This key is required as a parameter when redeploying the forms-flow-ai chart to ensure proper integration and functionality.
+The Insight API key can be found in your Redash application under `Settings` > `Account` > `API Key`.
+
+![alt text](redash.png)
+
+After obtaining the API key from your Redash account, assign it to the `insight_api_key` variable in the values.yml file of the forms-flow-ai Helm chart and redeploy the forms-flow-ai chart.
 
 ## Conclusion
 
