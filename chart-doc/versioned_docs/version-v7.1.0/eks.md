@@ -1,7 +1,7 @@
 
 
 # formsflow.ai Premium (Kubernetes)
-![Helm Chart Version](https://img.shields.io/badge/Helm%20Chart%20Version-8.0.0-blue)
+![Helm Chart Version](https://img.shields.io/badge/Helm%20Chart%20Version-8.2.0-blue)
 
 [formsflow.ai](https://formsflow.ai/) offers a premium version in addition to its open-source offering. The premium version includes advanced features such as form bundling, AI-powered automatic form creation, and a no-code workflow builder. These enhanced capabilities are designed to streamline form management, improve efficiency, and provide greater flexibility for users seeking scalable and customizable solutions.
 
@@ -154,7 +154,16 @@ helm upgrade --install forms-flow-documents-api forms-flow-documents-api \
 ```
 The list of customizable parameters for the `forms-flow-documents-api` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-documents-api/README.md).
 
-## 7. forms-flow-data-analysis
+## 7. Forms-flow-data-layer
+
+The **forms-flow-data-layer** service is introduced as a dedicated backend component to support GraphQL. It acts as a centralized data access layer with direct connectivity to all underlying databases, including Formio's MongoDB and the WebAPI's PostgreSQL. This separation allows for cleaner architecture, improved security, and more efficient querying across multiple data sources via GraphQL.
+
+```bash
+helm upgrade --install forms-flow-data-layer forms-flow-data-layer --set ingress.hostname=<FQDN> -n <namespace>
+```
+The list of customizable parameters for the `forms-flow-data-layer` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-data-layer/README.md).
+
+## 8. forms-flow-data-analysis
 
 This module is intended to update forms based on specific topics mentioned by the designer during form creation.
 
@@ -166,7 +175,7 @@ helm upgrade --install forms-flow-data-analysis forms-flow-data-analysis \
 ```
 The list of customizable parameters for the `forms-flow-data-analysis` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-data-analysis/README.md).
 
-## 8. forms-flow-web
+## 9. forms-flow-web
 
 [formsflow.ai](https://formsflow.ai/) delivers progressive web application with React version 17.0.2 along with formio
 
@@ -178,7 +187,7 @@ helm upgrade --install forms-flow-web forms-flow-web \
 ```
 The list of customizable parameters for the `forms-flow-web` chart can be found [here](https://github.com/AOT-Technologies/forms-flow-ai-charts/blob/master/charts/forms-flow-web/README.md).
 
-## 9. forms-flow-analytics (Optional)
+## 110. forms-flow-analytics (Optional)
 
 [formsflow.ai](https://formsflow.ai/) leverages [Redash](https://github.com/getredash/redash) to build interactive dashboards and gain insights. To create meaningful visualization for your use case with [Redash Knowledge base.](https://redash.io/help/) 
 
@@ -202,7 +211,7 @@ The Insight API key can be found in your Redash application under `Settings` > `
 
 After obtaining the API key from your Redash account, assign it to the `insight_api_key` variable in the values.yml file of the forms-flow-ai Helm chart and redeploy the forms-flow-ai chart.
 
-## 10. forms-flow-admin
+## 11. forms-flow-admin
 
 [formsflow.ai](https://formsflow.ai/) Admin API is a Python REST API to provision tenants in a multi tenanted environment.
 
