@@ -35,19 +35,27 @@ a) If you encountered this warning from **Microsoft Defender** click `run anyway
 
 ![warning preview](../static/img/microsoft-defender-warning.png)
 
-b) The installation starts with the following question:
 
-![Redash analytics prompt](../static/img/analytics.png)
-- If you need Redash Analytics Engine in the installation, provide **‘y’** as the answer, or else answer **‘n’**. (To know more about Redash Analytics Engine, please visit [Redash](https://redash.io/help/) ).
+b) The installation process will start and you will be presented with your IP Address verification question. Verify the IP address is valid or incorrect after that if true, provide **‘y’** as the answer, or else answer **‘n’**:
 
+![IP Address prompt](../static/img/latest/ip-address-prompt.png)
 
-c) Verify the IP address is valid or incorrect after that. If true, provide **‘y’** as the answer, or else answer **‘n’**:
+c) Now to install “Analytics” enter **‘y’**. (You will asked to enter the Redash API key later)
 
-![IP Address prompt](../static/img/ip-address-prompt.png)
+![analytics installation prompt](../static/img/latest/analytics.png)
 
-d) As part of the installation, if the user has chosen the option to install with “Analytics” the user is asked to enter the Redash API key after the successful installation of Redash.
+d) Now it will ask to include **formsflow data analysis api** in the installation. Chose **'y'** or **'n'** according to your preference:
 
-![redash api key prompt](../static/img/redash-api-key-prompt.png)
+![formsflow data analysis api prompt](../static/img/latest/analysis-api.png)
+
+e) Now it will show the installation summary with the configurations and option you selected. Just enter **'y'** to start the installation (or **'n'** to cancel the installation):
+
+![Installation summary](../static/img/latest/installation-summary.png)
+
+f) Now it will ask for the Redash API key:
+
+![Redash API Key prompt](../static/img/latest/redash-api.png)
+
 - The Redash application should be available for use at port defaulted to 7000. Open http://localhost:7001/ on your machine and register with any valid credentials:
  ![redash landing page](../static/img/redash-landing.png)
 
@@ -55,13 +63,9 @@ d) As part of the installation, if the user has chosen the option to install wit
   ![redash setings page](../static/img/redash-settings-page.png)
 
 
-e) Now it will ask to include **formsflow data analysis api** in the installation. Chose **'y'** or **'n'** according to your preference:
+g) Once the installation is complete, the command prompt displays the **Formsflow.ai has been successfully installed** and you can access the application at the given url. Press any key to finish the installation. The Docker Desktop displays all the installed containers:
 
-![formsflow data analysis api prompt](../static/img/data-analysis-api-prompt.png)
-
-f) Once the installation is complete, the command prompt displays the **Formsflow.ai is successfully installed** and press any key to finish the installation. The Docker Desktop displays all the installed containers:
-
-![Successfull installation](../static/img/succsess.png)
+![Successfull installation](../static/img/latest/completed.png)
 
 
 ## Step 4: Mail-Configuration
