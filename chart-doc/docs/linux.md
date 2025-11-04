@@ -50,24 +50,33 @@ Type `./install.sh` to start the installation:
 ![installation start](../static/img/linux/installation-start.png)
 
 
-a) The installation starts with the following question:
-
-![Redash analytics prompt](../static/img/linux/analytics-prompt.png)
-- If you need Redash Analytics Engine in the installation, provide **‘y’** as the answer, or else answer **‘n’**. (To know more about Redash Analytics Engine, please visit [Redash](https://redash.io/help/) ).
-
-
-b) Verify the IP address is valid or incorrect after that. If true, provide **‘y’** as the answer, or else answer **‘n’**:
+a) Verify the IP address is valid or incorrect after that. If true, provide **‘y’** as the answer, or else answer **‘n’**:
 
 ![IP Address prompt](../static/img/linux/ip-address-prompt.png)
 
+b) Now to install “Analytics” enter ‘y’:
+
+![Redash analytics prompt](../static/img/linux/analytics-prompt.png)
+- If you need Redash Analytics Engine in the installation, provide **‘y’** as the answer, or else answer **‘n’**. (To know more about Redash Analytics Engine, please visit [Redash](https://redash.io/help/) ).
 
 c) Now it will ask to install **formsflow data analysis** api in the installation. Chose **'y'** or **'n'** according to your preference:
 
 ![formsflow data analysis api prompt](../static/img/linux/formsflow-analytics-api-prompt.png)
 
 
-d) Once the installation is complete, the command prompt displays the **formsflow.ai is successfully installed**.
+d) Now it will ask for *Redash API Key*:
+![redash api key prompt](../static/img/linux/redash-prompt.png)
+- The Redash application should be available for use at port defaulted to 7000. Open http://localhost:7001/ on your machine and register with any valid credentials:
+ ![redash landing page](../static/img/linux/redash-landing.png)
 
+- Then the API Key can be found at settings > Account > API Key.
+ ![redash api page](../static/img/linux/redash-api-page.png)
+
+e) After the installation process has been completed it will show **formsflow.ai is successfully installed**.
+
+![Completed](../static/img/linux/complete.png)
+
+---
 
 ## Step 4: Mail-Configuration
 
