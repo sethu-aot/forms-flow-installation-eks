@@ -1,5 +1,4 @@
-
-
+![Version](https://img.shields.io/badge/Version%209.0.0-%23ebedf0?logoColor=%23040105&labelColor=%23ebedf0&color=%23ebedf0&style=flat)
 # formsflow.ai Premium (Kubernetes)
 ![Helm Chart Version](https://img.shields.io/badge/Helm%20Chart%20Version-8.3.0-blue)
 
