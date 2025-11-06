@@ -41,6 +41,13 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
+          versions: {
+            current: {
+              label: 'Next',
+              path: 'next',
+              badge: false,
+            },
+          },
             // ...
            // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
