@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 ---
-
+![Version](https://img.shields.io/badge/Version%208.0.0-%23ebedf0?logoColor=%23040105&labelColor=%23ebedf0&color=%23ebedf0&style=flat)
 # Windows
 
 ### Prerequisites
