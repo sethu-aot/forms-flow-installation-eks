@@ -8,9 +8,7 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - main
-      - feature/sonarqubeIntegration
-  workflow_dispatch:
-
+      
 jobs:
   sonarcloud:
     name: SonarCloud Scan
