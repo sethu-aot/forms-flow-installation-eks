@@ -1,5 +1,5 @@
 # forms-flow-installation-eks
-<div align="center"><img src=".images/logo.png"/></div>
+<div align="center"><img src="https://github.com/AOT-Technologies/forms-flow-ai-deployment/blob/main/.images/logo.png?raw=true"/></div>
 <hr/> 
  
 [![Join the chat at https://stackoverflow.com/questions/tagged/formsflow.ai](https://img.shields.io/badge/ask%20-on%20%20stackoverflow-F47F24)](https://stackoverflow.com/questions/tagged/formsflow.ai?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
