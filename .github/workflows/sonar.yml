@@ -1,0 +1,42 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - release/**
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - release/**
+      
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: chart-doc
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=AOT-Technologies_forms-flow-installation-eks
+            -Dsonar.organization=aot-technologies
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
