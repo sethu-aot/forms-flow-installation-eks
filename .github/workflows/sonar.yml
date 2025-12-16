@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - main
+      - release/**
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - main
-  workflow_dispatch:
-
+      - release/**
+      
 jobs:
   sonarcloud:
     name: SonarCloud Scan
@@ -34,8 +35,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=sethu-aot_forms-flow-installation-eks
-            -Dsonar.organization=sethu-aot
+            -Dsonar.projectKey=AOT-Technologies_forms-flow-installation-eks
+            -Dsonar.organization=aot-technologies
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
